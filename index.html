@@ -71,10 +71,10 @@
   <div class="container">
     <h4> How to install Ptero-panel With Cloudflare Tunnel</h4>
 
-    <h2>Step 1/1</h2>
+    <h2>Step 1/6</h2>
     <pre>apt update && apt install curl -y</pre>
 
-    <h2>Step 2/1</h2>
+    <h2>Step 2/6</h2>
     <pre>bash <(curl https://pterodactyl-installer.se)</pre>
     <p>
       - type in your domain/subdomain, <strong>for example sub.domain</strong><br>
@@ -98,9 +98,8 @@ sed -i 's|^\s*ssl_certificate_key\s\+.*|    ssl_certificate_key /2.pem;|' /etc/n
 sed -i 's/\b443\b/8443/g; s/\b80\b/8000/g' /etc/nginx/sites-available/pterodactyl.conf
 systemctl restart nginx
     </pre>
-    <p>no output is OK</p>
 
-    <h2>Step 4/1 - Cloudflare Tunnel</h2>
+    <h2>Step 4/6 - Cloudflare Tunnel</h2>
     <p>Go to <a href="https://one.dash.cloudflare.com/" target="_blank">one.dash.cloudflare.com</a></p>
     <ul>
       <li>Network → Tunnels → Create Tunnel</li>
@@ -119,7 +118,7 @@ whenever your machine starts"</li>
     </ul>
     <p>Go to <strong>https://sub.domain (or whatever your subdomain is)</strong> and check if it works.</p>
       <p>if it works; Congrats, You've setup the panel properly.</p>
-    <h2>Step 1/2 (Wings)</h2>
+    <h2>Step 5/6 (Wings)</h2>
     <ul>
       <li>Do step 1 again, but select <strong>1</strong> this time</li>
       <li>Say <strong>y</strong> to "Unsupported type of virtualization"</li>
@@ -130,7 +129,7 @@ whenever your machine starts"</li>
       <li>Additional Settings → TLS → enable "No TLS Verify"</li>
       <li>it's wings setup time</li>
     </ul>
-    <h2>Step 2/2 (Still Wings)</h2>
+    <h2>Step 6/6 (Still Wings)</h2>
     <ul>
       <li>Login to panel</li>
       <li>Admin → Locations → Create one (for me: US1)</li>
