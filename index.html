@@ -1,0 +1,158 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="UTF-8">
+  <title>Pterodactyl Tunneling</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      background: #0f0f0f;
+      color: #f2f2f2;
+      font-family: monospace;
+      font-size: 20px;
+    }
+    header {
+      padding: 3rem 2rem 1rem;
+      text-align: center;
+    }
+    h1 {
+      font-size: 4rem;
+      margin: 0;
+    }
+    h2 {
+      color: #999;
+      font-weight: normal;
+      font-size: 1.8rem;
+      border-bottom: 1px solid #333;
+      padding-bottom: 6px;
+    }
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+      line-height: 1.8;
+      font-size: 1.25rem;
+    }
+    ul {
+      padding-left: 1.5rem;
+    }
+    li {
+      margin-bottom: 0.8rem;
+    }
+    a {
+      color: #4df;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    code, pre {
+      background: #1a1a1a;
+      color: #7fffd4;
+      padding: 0.8rem 1rem;
+      display: block;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      overflow-x: auto;
+    }
+    .footer {
+      font-size: 0.9rem;
+      color: #777;
+      margin-top: 3rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <main>
+  <div class="container">
+    <h4>How to install Pterodactyl on KVM-i7</h4>
+
+    <h2>Step 1/1</h2>
+    <pre>apt update && apt install curl -y</pre>
+
+    <h2>Step 2/1</h2>
+    <pre>bash <(curl https://pterodactyl-installer.se)</pre>
+    <p>
+      - type in your domain/subdomain, <strong>for me it's testpanel.kvm-i7.host</strong><br>
+      - no ufw<br>
+      - HTTPS using Let's Encrypt? type <strong>n</strong><br>
+      - Assume SSL? type <strong>y</strong><br>
+      - agree HTTPS request? type <strong>n</strong>
+    </p>
+    <pre>##############################################################
+* Hostname/FQDN: sub.domain
+* Configure Firewall? false
+* Configure Let's Encrypt? false
+* Assume SSL? true
+##############################################################
+    </pre>
+
+    <h2>Step 3/1</h2>
+    <pre>openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /2.pem -out /1.pem -subj "/CN=localhost"
+sed -i 's|^\s*ssl_certificate\s\+.*|    ssl_certificate /1.pem;|' /etc/nginx/sites-available/pterodactyl.conf
+sed -i 's|^\s*ssl_certificate_key\s\+.*|    ssl_certificate_key /2.pem;|' /etc/nginx/sites-available/pterodactyl.conf
+sed -i 's/\b443\b/8443/g; s/\b80\b/8000/g' /etc/nginx/sites-available/pterodactyl.conf
+systemctl restart nginx
+    </pre>
+    <p>no output is OK</p>
+
+    <h2>Step 4/1 - Cloudflare Tunnel</h2>
+    <p>Go to <a href="https://one.dash.cloudflare.com/" target="_blank">one.dash.cloudflare.com</a></p>
+    <ul>
+      <li>Network → Tunnels → Create Tunnel</li>
+      <li>Select cloudflared, name it whatever you want</li>
+      <li>Choose Debian → click under "If you don’t have cloudflared installed on your machine"</li>
+      <li>Paste the copied install command into the VPS shell</li>
+      <li>Then click under "After you have installed cloudflared on your
+ machine, you can install a service to automatically run your tunnel 
+whenever your machine starts"</li>
+      <li>Again, Paste the copied install command into the VPS shell.</li>
+      <li>Now click next, use the <strong>same subdomain</strong> Enter Your Subdomain</li>
+      <li>Service Type: https</li>
+      <li>Service URL: localhost:8443</li>
+      <li>Additional Settings → TLS → enable "No TLS Verify"</li>
+      <li>Click save hostname</li>
+    </ul>
+    <p>Go to <strong>https://sub.domain (or whatever your subdomain is)</strong> and check if it works.</p>
+      <p>if it works; Congrats, You've setup the panel properly.</p>
+    <h2>Step 1/2 (Wings)</h2>
+    <ul>
+      <li>Do step 1 again, but select <strong>1</strong> this time</li>
+      <li>Say <strong>y</strong> to "Unsupported type of virtualization"</li>
+      <li><strong>n</strong> to UFW, DB user, Let's Encrypt</li>
+      <li>Refer to step 4, but in Cloudflare: tunnel name → edit → public hostnames → add new</li>
+      <li>Use the node subdomain <strong>enter your subdomain</strong>)</li>
+      <li>Service URL: <strong>localhost:443</strong></li>
+      <li>Additional Settings → TLS → enable "No TLS Verify"</li>
+      <li>it's wings setup time</li>
+    </ul>
+    <h2>Step 2/2 (Still Wings)</h2>
+    <ul>
+      <li>Login to panel</li>
+      <li>Admin → Locations → Create one (for me: US1)</li>
+      <li>Admin → Nodes → Add node (name it whatever)</li>
+      <li>Daemon Port: 443</li>
+      <li>SSL: Not Behind Proxy</li>
+      <li>Use the node subdomain as the FQDN (for me: <strong>node.domain</strong>)</li>
+      <li>Copy config token and run the command as usual</li>
+    </ul>
+    <p>If <strong>panel and node are on different hosts</strong>:</p>
+    <pre>openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /2.pem -out /1.pem -subj "/CN=localhost"
+sed -i 's|^\(\s*cert:\s*\).*|\1/1.pem|' /etc/pterodactyl/config.yml
+sed -i 's|^\(\s*key:\s*\).*|\1/2.pem|' /etc/pterodactyl/config.yml
+systemctl restart wings
+    </pre>
+    <p>If <strong>panel and node are on the same host</strong>:</p>
+    <pre>sed -i 's|^\(\s*cert:\s*\).*|\1/1.pem|' /etc/pterodactyl/config.yml
+sed -i 's|^\(\s*key:\s*\).*|\1/2.pem|' /etc/pterodactyl/config.yml
+systemctl restart wings
+    </pre>
+    <p>See if there is a green heart, if yes; Congrats, You've setup wings properly.</p>
+  </div>
+</main>
+  <div class="footer">
+    <p>Credit: <strong>nittin</strong> - <a href="https://discord.gg/ultrixcloud.">ultrixcloud</a></p>
+  </div>
+</body></html>
