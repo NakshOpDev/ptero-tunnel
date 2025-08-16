@@ -143,7 +143,8 @@ whenever your machine starts"</li>
       <li>Use the node subdomain as the FQDN (for me: <strong>node.domain</strong>)</li>
       <li>Copy config token</li>
         <li>Run token And Ctrl + A + enter + Ctrl + D + enter</li>
-        <pre>apt install screen -y && screen </pre>
+        <pre>apt install screen -y && screen -S 10 </pre>
+    <li>Run token And Ctrl + A + enter + Ctrl + D + enter</li>
     </ul>
     <p>If <strong>panel and node are on different hosts</strong>:</p>
     <pre>openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /2.pem -out /1.pem -subj "/CN=localhost"
