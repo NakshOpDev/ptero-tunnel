@@ -131,7 +131,10 @@ whenever your machine starts"</li>
       <li>Use the node subdomain <strong>enter your subdomain</strong>)</li>
       <li>Service URL: <strong>localhost:443</strong></li>
       <li>Additional Settings → TLS → enable "No TLS Verify"</li>
-      <li>it's wings setup time</li>
+           <pre>apt install screen -y && screen -S 10 </pre>
+    <li>Run token And Ctrl + A + enter + Ctrl + D + enter</li>
+        
+        <li>it's wings setup time</li>
     </ul>
     <h2>Step 6/6 (Still Wings)</h2>
     <ul>
@@ -141,11 +144,7 @@ whenever your machine starts"</li>
       <li>Daemon Port: 443</li>
       <li>SSL: Not Behind Proxy</li>
       <li>Use the node subdomain as the FQDN (for me: <strong>node.domain</strong>)</li>
-      <li>Copy config token</li>
-        <li>Run token And Ctrl + A + enter + Ctrl + D + enter</li>
-        <pre>apt install screen -y && screen -S 10 </pre>
-    <li>Run token And Ctrl + A + enter + Ctrl + D + enter</li>
-    </ul>
+      <li>Copy config token and Paste As usual</li>    </ul>
     <p>If <strong>panel and node are on different hosts</strong>:</p>
     <pre>openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /2.pem -out /1.pem -subj "/CN=localhost"
 sed -i 's|^\(\s*cert:\s*\).*|\1/1.pem|' /etc/pterodactyl/config.yml
